@@ -1,0 +1,45 @@
+import { prisma } from "@/lib/prisma";
+import { notFound } from "next/navigation";
+import CourseForm from "@/components/admin/CourseForm";
+import LessonManager from "@/components/admin/LessonManager";
+
+export default async function EditCoursePage({ params }: { params: { id: string } }) {
+  const [course, categories] = await Promise.all([
+    prisma.course.findUnique({
+      where: { id: params.id },
+      include: { lessons: { orderBy: { order: "asc" } } },
+    }),
+    prisma.category.findMany({ orderBy: { name: "asc" } }),
+  ]);
+
+  if (!course) notFound();
+
+  return (
+    <>
+      <h1 className="font-display text-2xl font-extrabold text-brand-navy mb-1">{course.title}</h1>
+      <p className="text-sm text-brand-slate/60 mb-8">Modifier la formation</p>
+
+      <section className="mb-12">
+        <CourseForm
+          categories={categories}
+          initial={{
+            id: course.id,
+            title: course.title,
+            description: course.description,
+            categoryId: course.categoryId,
+            level: course.level,
+            type: course.type,
+            priceUSD: course.priceUSD / 100,
+            certifying: course.certifying,
+            instructor: course.instructor ?? "",
+          }}
+        />
+      </section>
+
+      <section>
+        <h2 className="font-display text-lg font-bold text-brand-navy mb-4">Leçons</h2>
+        <LessonManager courseId={course.id} lessons={course.lessons} />
+      </section>
+    </>
+  );
+}

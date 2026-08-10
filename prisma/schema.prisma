@@ -1,0 +1,204 @@
+// ============================================================
+// E-CLASSE RDC — Schéma de base de données
+// ============================================================
+// En développement : SQLite (fichier local, zéro configuration)
+// En production : remplacer provider par "postgresql" et
+// définir DATABASE_URL vers ta base Postgres (ex: Neon, Supabase, Railway)
+// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------- UTILISATEURS ----------------
+
+model User {
+  id             String    @id @default(cuid())
+  name           String
+  email          String    @unique
+  passwordHash   String?
+  image          String?
+  role           Role      @default(STUDENT)
+  createdAt      DateTime  @default(now())
+
+  subscriptions  Subscription[]
+  enrollments    Enrollment[]
+  certificates   Certificate[]
+  payments       Payment[]
+  messages       Message[]
+}
+
+enum Role {
+  STUDENT
+  FORMATEUR
+  ADMIN
+}
+
+// ---------------- ABONNEMENTS ----------------
+
+model Plan {
+  id            String   @id @default(cuid())
+  name          String   // "Gratuit", "PRO", "Expert"
+  priceUSD      Int      // prix en cents (ex: 999 = 9.99$)
+  durationDays  Int      // durée de l'abonnement
+  description   String?
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  planId     String
+  plan       Plan     @relation(fields: [planId], references: [id])
+  startDate  DateTime @default(now())
+  endDate    DateTime
+  status     SubStatus @default(ACTIVE)
+  createdAt  DateTime @default(now())
+}
+
+enum SubStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+}
+
+// ---------------- FORMATIONS ----------------
+
+model Category {
+  id        String   @id @default(cuid())
+  name      String
+  icon      String?  // nom d'icône ou emoji
+  courses   Course[]
+}
+
+model Course {
+  id            String   @id @default(cuid())
+  title         String
+  description   String
+  coverImage    String?
+  level         Level    @default(DEBUTANT)
+  type          CourseType @default(GRATUITE)
+  priceUSD      Int      @default(0) // 0 si gratuite
+  certifying    Boolean  @default(false)
+  instructor    String?
+  categoryId    String
+  category      Category @relation(fields: [categoryId], references: [id])
+  createdAt     DateTime @default(now())
+
+  lessons       Lesson[]
+  enrollments   Enrollment[]
+  certificates  Certificate[]
+}
+
+enum Level {
+  DEBUTANT
+  INTERMEDIAIRE
+  AVANCE
+}
+
+enum CourseType {
+  GRATUITE
+  ABORDABLE
+  CERTIFIANTE
+  EXPERTE
+}
+
+model Lesson {
+  id        String  @id @default(cuid())
+  courseId  String
+  course    Course  @relation(fields: [courseId], references: [id])
+  title     String
+  order     Int
+  videoUrl  String?
+  content   String?
+
+  completions LessonCompletion[]
+}
+
+// ---------------- PROGRESSION / INSCRIPTIONS ----------------
+
+model Enrollment {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  courseId    String
+  course      Course   @relation(fields: [courseId], references: [id])
+  progress    Int      @default(0) // pourcentage 0-100
+  completed   Boolean  @default(false)
+  enrolledAt  DateTime @default(now())
+
+  lessonCompletions LessonCompletion[]
+
+  @@unique([userId, courseId])
+}
+
+// Trace quelle leçon a été terminée, pour calculer la progression réelle
+// et déclencher automatiquement la génération du certificat.
+model LessonCompletion {
+  id           String     @id @default(cuid())
+  enrollmentId String
+  enrollment   Enrollment @relation(fields: [enrollmentId], references: [id])
+  lessonId     String
+  lesson       Lesson     @relation(fields: [lessonId], references: [id])
+  completedAt  DateTime   @default(now())
+
+  @@unique([enrollmentId, lessonId])
+}
+
+// ---------------- CERTIFICATS ----------------
+
+model Certificate {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  courseId      String
+  course        Course   @relation(fields: [courseId], references: [id])
+  partnerLabel  String?  // ex: "Kinshasa Bible College"
+  qrCode        String?  // data URL du QR code généré
+  issuedAt      DateTime @default(now())
+  verifyCode    String   @unique @default(cuid())
+}
+
+// ---------------- PAIEMENTS ----------------
+
+model Payment {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  amountUSD     Int
+  provider      PaymentProvider
+  channel       String?  // ex: "OM" (Orange Money), "MOMO", "VISA" — renvoyé par CinetPay
+  providerRef   String?  // référence transaction CinetPay/Stripe
+  status        PaymentStatus @default(PENDING)
+  purpose       String   // "subscription:<planId>" ou "course:<courseId>"
+  createdAt     DateTime @default(now())
+}
+
+enum PaymentProvider {
+  CINETPAY
+  STRIPE
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+// ---------------- MESSAGERIE (formateurs <-> étudiants) ----------------
+
+model Message {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  content   String
+  fromRole  Role
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
