@@ -5,7 +5,15 @@ import { useRouter } from "next/navigation";
 
 type Lesson = { id: string; title: string; order: number };
 
-export default function LessonManager({ courseId, lessons }: { courseId: string; lessons: Lesson[] }) {
+export default function LessonManager({
+  courseId,
+  lessons,
+  apiBase = "/api/admin",
+}: {
+  courseId: string;
+  lessons: Lesson[];
+  apiBase?: string;
+}) {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [loading, setLoading] = useState(false);
@@ -16,7 +24,7 @@ export default function LessonManager({ courseId, lessons }: { courseId: string;
     if (!title.trim()) return;
     setLoading(true);
 
-    await fetch(`/api/admin/courses/${courseId}/lessons`, {
+    await fetch(`${apiBase}/courses/${courseId}/lessons`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title }),
@@ -29,7 +37,7 @@ export default function LessonManager({ courseId, lessons }: { courseId: string;
 
   async function handleDelete(lessonId: string) {
     setDeletingId(lessonId);
-    await fetch(`/api/admin/lessons/${lessonId}`, { method: "DELETE" });
+    await fetch(`${apiBase}/lessons/${lessonId}`, { method: "DELETE" });
     setDeletingId(null);
     router.refresh();
   }

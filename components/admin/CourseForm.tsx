@@ -31,14 +31,19 @@ const emptyCourse: CourseData = {
 export default function CourseForm({
   categories,
   initial,
+  apiBase = "/api/admin",
+  redirectBase = "/admin/courses",
 }: {
   categories: Category[];
   initial?: CourseData;
+  apiBase?: string;
+  redirectBase?: string;
 }) {
   const router = useRouter();
   const [data, setData] = useState<CourseData>(initial ?? { ...emptyCourse, categoryId: categories[0]?.id ?? "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [saved, setSaved] = useState(false);
 
   const isEditing = !!initial?.id;
 
@@ -46,13 +51,14 @@ export default function CourseForm({
     e.preventDefault();
     setLoading(true);
     setError("");
+    setSaved(false);
 
     const payload = {
       ...data,
       priceUSD: Math.round(Number(data.priceUSD) * 100), // dollars -> cents
     };
 
-    const res = await fetch(isEditing ? `/api/admin/courses/${initial!.id}` : "/api/admin/courses", {
+    const res = await fetch(isEditing ? `${apiBase}/courses/${initial!.id}` : `${apiBase}/courses`, {
       method: isEditing ? "PATCH" : "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -66,8 +72,15 @@ export default function CourseForm({
       return;
     }
 
-    router.push(isEditing ? `/admin/courses/${initial!.id}` : `/admin/courses/${result.id}`);
-    router.refresh();
+    setLoading(false);
+
+    if (isEditing) {
+      setSaved(true);
+      router.refresh();
+    } else {
+      router.push(`${redirectBase}/${result.id}`);
+      router.refresh();
+    }
   }
 
   return (
@@ -164,13 +177,20 @@ export default function CourseForm({
 
       {error && <p className="text-red-500 text-sm">{error}</p>}
 
-      <button
-        type="submit"
-        disabled={loading}
-        className="bg-brand-orange hover:bg-brand-orangeDark transition-colors text-white font-semibold px-6 py-2.5 rounded-full disabled:opacity-60"
-      >
-        {loading ? "Enregistrement..." : isEditing ? "Enregistrer les modifications" : "Créer la formation"}
-      </button>
+      <div className="flex items-center gap-3">
+        <button
+          type="submit"
+          disabled={loading}
+          className="bg-brand-orange hover:bg-brand-orangeDark transition-colors text-white font-semibold px-6 py-2.5 rounded-full disabled:opacity-60"
+        >
+          {loading ? "Enregistrement..." : isEditing ? "Enregistrer les modifications" : "Créer la formation"}
+        </button>
+        {saved && (
+          <span className="flex items-center gap-1.5 text-emerald-600 text-sm font-medium">
+            ✓ Modifications enregistrées
+          </span>
+        )}
+      </div>
 
       <style jsx>{`
         .input {

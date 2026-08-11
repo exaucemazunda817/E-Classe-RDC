@@ -3,14 +3,22 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function DeleteCourseButton({ courseId, courseTitle }: { courseId: string; courseTitle: string }) {
+export default function DeleteCourseButton({
+  courseId,
+  courseTitle,
+  apiBase = "/api/admin",
+}: {
+  courseId: string;
+  courseTitle: string;
+  apiBase?: string;
+}) {
   const router = useRouter();
   const [confirming, setConfirming] = useState(false);
   const [loading, setLoading] = useState(false);
 
   async function handleDelete() {
     setLoading(true);
-    await fetch(`/api/admin/courses/${courseId}`, { method: "DELETE" });
+    await fetch(`${apiBase}/courses/${courseId}`, { method: "DELETE" });
     setLoading(false);
     router.refresh();
   }

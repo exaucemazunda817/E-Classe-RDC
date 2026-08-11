@@ -138,12 +138,22 @@ les instructions DNS. Pense à mettre `NEXTAUTH_URL` à jour avec le domaine fin
 - Pour promouvoir un autre utilisateur en admin : `npm run db:studio` → table `User` →
   change son `role` en `ADMIN`
 
-## Étape 9 — Changer son mot de passe (fait)
-- **`/account/password`** : formulaire sécurisé (demande le mot de passe actuel avant
-  d'autoriser le changement), accessible depuis `/account/profile`
-- Utilise-le pour changer le mot de passe du compte admin par défaut dès ta première
-  connexion
+## Étape 10 — Espace enseignant (fait)
+- **`/teacher`** : tableau de bord d'un formateur — liste de ses propres formations
+  uniquement (jamais celles des autres)
+- **`/teacher/courses/new`** et **`/teacher/courses/[id]`** : créer et modifier ses
+  formations, gérer ses leçons — chaque action vérifie côté serveur que la formation
+  appartient bien à ce formateur
+- **Liste des étudiants inscrits** par formation, avec leur progression en temps réel
+- **`/admin/users`** : nouvelle page admin pour changer le rôle d'un utilisateur
+  (Étudiant / Formateur / Admin) — c'est ici que tu transformes un compte en formateur
+- Confirmation visuelle ("✓ Modifications enregistrées") ajoutée sur le formulaire de
+  formation, admin et enseignant
 
+### Comment donner accès à quelqu'un
+1. Connecte-toi en admin → `/admin/users`
+2. Trouve la personne dans la liste, change son rôle en **Formateur**
+3. Elle verra alors un bandeau "Accéder à l'espace enseignant" sur sa page `/account`
 ## Étape 9 — Changement de mot de passe (fait)
 - **`/account/password`** : formulaire sécurisé (mot de passe actuel requis, nouveau
   mot de passe confirmé deux fois), accessible depuis `/account/profile`

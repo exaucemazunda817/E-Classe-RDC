@@ -22,3 +22,13 @@ export async function getCurrentAdmin() {
   if (!user || user.role !== "ADMIN") return null;
   return user;
 }
+
+/**
+ * Retourne l'utilisateur connecté s'il est FORMATEUR ou ADMIN (les admins peuvent
+ * aussi accéder à l'espace enseignant pour dépanner), sinon null.
+ */
+export async function getCurrentTeacher() {
+  const user = await getCurrentUser();
+  if (!user || (user.role !== "FORMATEUR" && user.role !== "ADMIN")) return null;
+  return user;
+}

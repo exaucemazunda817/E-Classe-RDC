@@ -3,20 +3,18 @@ import Link from "next/link";
 import { getCurrentUser } from "@/lib/session";
 import Logo from "@/components/Logo";
 import SignOutButton from "@/components/SignOutButton";
-import { IconGrid, IconBookOpen, IconHome, IconUsers } from "@/lib/icons";
+import { IconHome, IconBookOpen } from "@/lib/icons";
 
 const navItems = [
-  { href: "/admin", label: "Tableau de bord", Icon: IconHome },
-  { href: "/admin/courses", label: "Formations", Icon: IconBookOpen },
-  { href: "/admin/categories", label: "Catégories", Icon: IconGrid },
-  { href: "/admin/users", label: "Utilisateurs", Icon: IconUsers },
+  { href: "/teacher", label: "Mes formations", Icon: IconHome },
+  { href: "/teacher/courses/new", label: "Nouvelle formation", Icon: IconBookOpen },
 ];
 
-export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+export default async function TeacherLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();
 
   if (!user) redirect("/login");
-  if (user.role !== "ADMIN") redirect("/");
+  if (user.role !== "FORMATEUR" && user.role !== "ADMIN") redirect("/");
 
   return (
     <div className="min-h-screen flex">
@@ -48,7 +46,6 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <SignOutButton />
         </header>
 
-        {/* Navigation mobile simplifiée */}
         <nav className="md:hidden flex overflow-x-auto gap-2 px-6 py-3 bg-white border-b border-brand-line">
           {navItems.map((item) => (
             <Link

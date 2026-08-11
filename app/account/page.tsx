@@ -68,6 +68,16 @@ export default async function AccountPage() {
           </Link>
         )}
 
+        {(user.role === "FORMATEUR" || user.role === "ADMIN") && (
+          <Link
+            href="/teacher"
+            className="flex items-center justify-between rounded-2xl bg-brand-blue px-5 py-4 mb-6 text-white"
+          >
+            <span className="text-sm font-semibold">Accéder à l'espace enseignant</span>
+            <IconChevronRight className="w-4 h-4" />
+          </Link>
+        )}
+
         {/* ---------- ABONNEMENT ---------- */}
         {activeSub ? (
           <div className="rounded-2xl bg-brand-navy p-6 mb-8 relative overflow-hidden">

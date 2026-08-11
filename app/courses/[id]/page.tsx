@@ -12,7 +12,7 @@ export default async function CourseDetailPage({ params }: { params: { id: strin
 
   const course = await prisma.course.findUnique({
     where: { id: params.id },
-    include: { category: true, lessons: { orderBy: { order: "asc" } } },
+    include: { category: true, lessons: { orderBy: { order: "asc" } }, instructorUser: true },
   });
 
   if (!course) notFound();
@@ -48,7 +48,9 @@ export default async function CourseDetailPage({ params }: { params: { id: strin
 
           <div className="flex flex-wrap items-center gap-4 mt-6 text-sm text-white/60">
             <span className="capitalize">{course.level.toLowerCase()}</span>
-            {course.instructor && <span>Par {course.instructor}</span>}
+            {(course.instructorUser?.name || course.instructor) && (
+              <span>Par {course.instructorUser?.name || course.instructor}</span>
+            )}
             {course.certifying && (
               <span className="flex items-center gap-1.5 text-brand-orange font-semibold">
                 <IconMedal className="w-4 h-4" /> Formation certifiante

@@ -4,10 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "prisma generate",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
     "db:seed": "tsx prisma/seed.ts"
@@ -36,12 +35,5 @@
     "autoprefixer": "^10.4.19",
     "prisma": "^5.19.0",
     "tsx": "^4.16.2"
-  },
-  "allowScripts": {
-    "@prisma/client@5.22.0": true,
-    "@prisma/engines@5.22.0": true,
-    "esbuild@0.28.2": true,
-    "prisma@5.22.0": true,
-    "fsevents@2.3.3": true
   }
 }
