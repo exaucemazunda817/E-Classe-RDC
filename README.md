@@ -141,9 +141,8 @@ les instructions DNS. Pense à mettre `NEXTAUTH_URL` à jour avec le domaine fin
 ## Étape 10 — Espace enseignant (fait)
 - **`/teacher`** : tableau de bord d'un formateur — liste de ses propres formations
   uniquement (jamais celles des autres)
-- **`/teacher/courses/new`** et **`/teacher/courses/[id]`** : créer et modifier ses
-  formations, gérer ses leçons — chaque action vérifie côté serveur que la formation
-  appartient bien à ce formateur
+- **`/teacher/courses/[id]`** : suivi d'une formation — informations, leçons et
+  liste des inscrits, en lecture seule (voir étape 13)
 - **Liste des étudiants inscrits** par formation, avec leur progression en temps réel
 - **`/admin/users`** : nouvelle page admin pour changer le rôle d'un utilisateur
   (Étudiant / Formateur / Admin) — c'est ici que tu transformes un compte en formateur
@@ -198,6 +197,30 @@ compte utilisateur — c'est ce lien qui rend la messagerie utilisable.
 2. En admin → `/admin/users` → passe son rôle à **Formateur**
 3. En admin → `/admin/courses/[la formation]` → champ **"Compte formateur lié"** →
    sélectionne-le → Enregistrer
+
+## Étape 13 — Espace enseignant en lecture seule (fait)
+Le modèle de droits est désormais : **l'admin gère tout le contenu, le formateur
+accompagne ses étudiants.** Un formateur n'a plus besoin — ni le droit — de créer
+sa propre formation pour être joignable par ses apprenants.
+
+| Action | Admin | Formateur |
+|---|---|---|
+| Créer une formation | ✅ | ❌ |
+| Modifier une formation (titre, prix, type…) | ✅ | ❌ |
+| Supprimer une formation | ✅ | ❌ |
+| Ajouter / retirer des leçons | ✅ | ❌ |
+| Voir ses formations assignées | ✅ | ✅ |
+| Voir les inscrits et leur progression | ✅ | ✅ |
+| Répondre aux messages des étudiants | ✅ | ✅ |
+
+La restriction est appliquée **côté serveur**, pas seulement en masquant des
+boutons : les routes d'écriture de `/api/teacher/*` ont été retirées. Une requête
+directe (POST, PATCH, DELETE) reçoit désormais un `405 Method Not Allowed`.
+
+Concrètement :
+- `/teacher/courses/new` et le bouton « Nouvelle formation » n'existent plus
+- `/teacher/courses/[id]` affiche les informations et les leçons en lecture seule
+- Un admin y voit un lien « Modifier depuis l'espace admin »
 
 ## 🔐 Bases de données : dev et production séparées
 `DATABASE_URL` dans le `.env` local doit pointer vers une base de **développement**,

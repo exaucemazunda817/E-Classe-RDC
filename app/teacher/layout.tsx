@@ -3,11 +3,12 @@ import Link from "next/link";
 import { getCurrentUser } from "@/lib/session";
 import Logo from "@/components/Logo";
 import SignOutButton from "@/components/SignOutButton";
-import { IconHome, IconBookOpen, IconMessageCircle } from "@/lib/icons";
+import { IconHome, IconMessageCircle } from "@/lib/icons";
 
+// L'espace enseignant est en lecture seule : créer et modifier les formations est
+// réservé à l'admin. Le formateur suit ses inscrits et répond à leurs messages.
 const navItems = [
   { href: "/teacher", label: "Mes formations", Icon: IconHome },
-  { href: "/teacher/courses/new", label: "Nouvelle formation", Icon: IconBookOpen },
   { href: "/teacher/messages", label: "Messages", Icon: IconMessageCircle },
 ];
 
