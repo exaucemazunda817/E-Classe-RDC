@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import StartConversationButton from "@/components/messaging/StartConversationButton";
 
 type StudentEnrollment = {
   id: string;
@@ -56,6 +57,13 @@ export default function StudentList({ courseId }: { courseId: string }) {
               {s.completed ? "Terminé" : `${s.progress}%`}
             </span>
           </div>
+          <StartConversationButton
+            courseId={courseId}
+            studentId={s.user.id}
+            basePath="/teacher/messages"
+            label="Message"
+            className="shrink-0 inline-flex items-center gap-1.5 text-xs font-semibold text-brand-blue border border-brand-line rounded-full px-3 py-1.5 hover:border-brand-blue/40 transition-colors"
+          />
         </div>
       ))}
     </div>

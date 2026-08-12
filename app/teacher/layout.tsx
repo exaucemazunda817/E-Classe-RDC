@@ -3,11 +3,12 @@ import Link from "next/link";
 import { getCurrentUser } from "@/lib/session";
 import Logo from "@/components/Logo";
 import SignOutButton from "@/components/SignOutButton";
-import { IconHome, IconBookOpen } from "@/lib/icons";
+import { IconHome, IconBookOpen, IconMessageCircle } from "@/lib/icons";
 
 const navItems = [
   { href: "/teacher", label: "Mes formations", Icon: IconHome },
   { href: "/teacher/courses/new", label: "Nouvelle formation", Icon: IconBookOpen },
+  { href: "/teacher/messages", label: "Messages", Icon: IconMessageCircle },
 ];
 
 export default async function TeacherLayout({ children }: { children: React.ReactNode }) {

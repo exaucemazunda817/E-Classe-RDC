@@ -185,3 +185,11 @@ export function IconCreditCard({ className }: IconProps) {
     </svg>
   );
 }
+
+export function IconSend({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" {...base}>
+      <path d="M21 3L11 13M21 3l-6.5 18-4-8-8-4L21 3z" />
+    </svg>
+  );
+}

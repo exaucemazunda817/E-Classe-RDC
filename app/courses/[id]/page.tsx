@@ -2,6 +2,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CoursePlayer from "@/components/CoursePlayer";
 import PurchaseCourseButton from "@/components/PurchaseCourseButton";
+import StartConversationButton from "@/components/messaging/StartConversationButton";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/session";
 import { IconMedal } from "@/lib/icons";
@@ -93,6 +94,24 @@ export default async function CourseDetailPage({ params }: { params: { id: strin
             certifying={course.certifying}
             hasCertificate={hasCertificate}
           />
+        )}
+
+        {user && user.role === "STUDENT" && enrollment && course.instructorId && (
+          <div className="mt-10 flex items-center justify-between gap-4 rounded-2xl border border-brand-line bg-white p-5">
+            <div>
+              <p className="font-display font-bold text-brand-navy text-sm mb-0.5">
+                Une question sur cette formation ?
+              </p>
+              <p className="text-xs text-brand-slate/60">
+                Écris directement à {course.instructorUser?.name || course.instructor}.
+              </p>
+            </div>
+            <StartConversationButton
+              courseId={course.id}
+              basePath="/account/messages"
+              label="Contacter le formateur"
+            />
+          </div>
         )}
       </section>
 

@@ -30,8 +30,10 @@ model User {
   enrollments    Enrollment[]
   certificates   Certificate[]
   payments       Payment[]
-  messages       Message[]
+  sentMessages   Message[]
   coursesTaught  Course[] @relation("CourseInstructor")
+  conversationsAsStudent Conversation[] @relation("StudentConversations")
+  conversationsAsTeacher Conversation[] @relation("TeacherConversations")
 }
 
 enum Role {
@@ -97,6 +99,7 @@ model Course {
   lessons       Lesson[]
   enrollments   Enrollment[]
   certificates  Certificate[]
+  conversations Conversation[]
 }
 
 enum Level {
@@ -196,12 +199,31 @@ enum PaymentStatus {
 
 // ---------------- MESSAGERIE (formateurs <-> étudiants) ----------------
 
-model Message {
+// Un fil de discussion entre un étudiant et un formateur, dans le contexte
+// d'une formation précise (un même duo peut avoir un fil par formation).
+model Conversation {
   id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  content   String
-  fromRole  Role
-  read      Boolean  @default(false)
+  studentId String
+  student   User     @relation("StudentConversations", fields: [studentId], references: [id])
+  teacherId String
+  teacher   User     @relation("TeacherConversations", fields: [teacherId], references: [id])
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id])
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  messages  Message[]
+
+  @@unique([studentId, teacherId, courseId])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  senderId       String
+  sender         User         @relation(fields: [senderId], references: [id])
+  content        String
+  read           Boolean      @default(false)
+  createdAt      DateTime     @default(now())
 }

@@ -23,7 +23,9 @@ export default async function AccountPage() {
     }),
     prisma.enrollment.findMany({ where: { userId: user.id } }),
     prisma.certificate.count({ where: { userId: user.id } }),
-    prisma.message.count({ where: { userId: user.id, read: false } }),
+    prisma.message.count({
+      where: { conversation: { studentId: user.id }, senderId: { not: user.id }, read: false },
+    }),
   ]);
 
   const inProgress = enrollments.filter((e) => !e.completed).length;

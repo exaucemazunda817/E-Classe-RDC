@@ -11,7 +11,7 @@ export default async function AccountLayout({ children }: { children: React.Reac
   }
 
   const unreadMessages = await prisma.message.count({
-    where: { userId: user.id, read: false, fromRole: { not: "STUDENT" } },
+    where: { conversation: { studentId: user.id }, senderId: { not: user.id }, read: false },
   });
 
   return (
