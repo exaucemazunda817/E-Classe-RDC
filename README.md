@@ -99,7 +99,7 @@ Le projet utilise SQLite en développement pour zéro configuration. En producti
    (voir `env.example.txt`) :
    - `DATABASE_URL` (ton URL Postgres de l'étape 1)
    - `NEXTAUTH_SECRET` (génère une valeur aléatoire, ex: `openssl rand -base64 32`)
-   - `NEXTAUTH_URL` → l'URL finale de ton site (ex: `https://e-classe-rdc.vercel.app`)
+   - `NEXTAUTH_URL` → l'URL finale de ton site (ex: `https://e-classe-rdc-en69.vercel.app`)
    - `CINETPAY_API_KEY`, `CINETPAY_SITE_ID`
 4. Déploie. Vercel exécute `npm run build` automatiquement
 5. Une fois en ligne, connecte-toi à la base et lance :
@@ -160,3 +160,53 @@ les instructions DNS. Pense à mettre `NEXTAUTH_URL` à jour avec le domaine fin
 - Fonctionne aussi pour changer le mot de passe du compte admin par défaut créé au seed
 - ✅ Après ta première connexion en tant qu'admin, va sur `/account/password` pour
   remplacer `ChangeMoi123!` par un mot de passe personnel
+
+## Étape 11 — Messagerie apprenant ↔ formateur (fait)
+Vraies conversations à double sens, rattachées à une formation (l'ancien modèle
+`Message` ne permettait qu'un envoi à sens unique, sans expéditeur ni destinataire).
+
+- **Côté étudiant** : bouton "Contacter le formateur" sur la page d'une formation,
+  liste des conversations sur `/account/messages`, fil de discussion sur
+  `/account/messages/[id]`
+- **Côté formateur** : onglet "Messages" dans l'espace enseignant, bouton "Message"
+  en face de chaque étudiant inscrit, fil sur `/teacher/messages/[id]`
+- Messages marqués comme lus à l'ouverture du fil, badges de non-lus des deux côtés
+- Une conversation est unique par couple (étudiant, formation) : rouvrir un fil
+  existant ne crée pas de doublon
+
+### ⚠️ Condition pour que le bouton apparaisse
+Le bouton "Contacter le formateur" ne s'affiche que si **les trois** conditions
+sont réunies :
+1. L'étudiant est connecté
+2. Il est **inscrit** à la formation
+3. La formation a un **compte formateur lié** (voir étape 12) — un simple nom
+   saisi à la main ne suffit pas, car il n'y a alors personne à qui écrire
+
+## Étape 12 — Lier un vrai compte formateur à une formation (fait)
+Le formulaire admin ne proposait qu'un champ texte libre pour le nom du formateur.
+Un nouveau champ **"Compte formateur lié"** permet désormais de choisir un vrai
+compte utilisateur — c'est ce lien qui rend la messagerie utilisable.
+
+- Le sélecteur n'apparaît que dans l'espace **admin** : un formateur ne peut pas
+  réattribuer sa propre formation à quelqu'un d'autre
+- Le serveur refuse tout compte n'ayant pas le rôle Formateur (ou Admin)
+- Les formations créées depuis `/teacher/courses/new` sont automatiquement liées
+  à leur auteur — rien à faire dans ce cas
+
+### Activer la messagerie sur une formation existante
+1. Le formateur crée son compte sur le site (ou utilise un compte existant)
+2. En admin → `/admin/users` → passe son rôle à **Formateur**
+3. En admin → `/admin/courses/[la formation]` → champ **"Compte formateur lié"** →
+   sélectionne-le → Enregistrer
+
+## 🔐 Bases de données : dev et production séparées
+`DATABASE_URL` dans le `.env` local doit pointer vers une base de **développement**,
+jamais vers la production — sinon le moindre test touche les données de vrais
+utilisateurs. L'URL de production est définie **uniquement** dans les variables
+d'environnement Vercel.
+
+Les deux bases sont des projets Neon distincts. Pour repartir de zéro en local :
+```bash
+npx prisma db push
+npm run db:seed
+```
