@@ -1,15 +1,17 @@
 import { prisma } from "@/lib/prisma";
+import { listTeacherAccounts } from "@/lib/instructors";
 import { notFound } from "next/navigation";
 import CourseForm from "@/components/admin/CourseForm";
 import LessonManager from "@/components/admin/LessonManager";
 
 export default async function EditCoursePage({ params }: { params: { id: string } }) {
-  const [course, categories] = await Promise.all([
+  const [course, categories, teachers] = await Promise.all([
     prisma.course.findUnique({
       where: { id: params.id },
       include: { lessons: { orderBy: { order: "asc" } } },
     }),
     prisma.category.findMany({ orderBy: { name: "asc" } }),
+    listTeacherAccounts(),
   ]);
 
   if (!course) notFound();
@@ -22,6 +24,7 @@ export default async function EditCoursePage({ params }: { params: { id: string 
       <section className="mb-12">
         <CourseForm
           categories={categories}
+          teachers={teachers}
           initial={{
             id: course.id,
             title: course.title,
@@ -32,6 +35,7 @@ export default async function EditCoursePage({ params }: { params: { id: string 
             priceUSD: course.priceUSD / 100,
             certifying: course.certifying,
             instructor: course.instructor ?? "",
+            instructorId: course.instructorId ?? "",
           }}
         />
       </section>

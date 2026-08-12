@@ -1,8 +1,12 @@
 import { prisma } from "@/lib/prisma";
+import { listTeacherAccounts } from "@/lib/instructors";
 import CourseForm from "@/components/admin/CourseForm";
 
 export default async function NewCoursePage() {
-  const categories = await prisma.category.findMany({ orderBy: { name: "asc" } });
+  const [categories, teachers] = await Promise.all([
+    prisma.category.findMany({ orderBy: { name: "asc" } }),
+    listTeacherAccounts(),
+  ]);
 
   return (
     <>
@@ -12,7 +16,7 @@ export default async function NewCoursePage() {
           Crée d'abord au moins une catégorie dans l'onglet "Catégories".
         </p>
       ) : (
-        <CourseForm categories={categories} />
+        <CourseForm categories={categories} teachers={teachers} />
       )}
     </>
   );

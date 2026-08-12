@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getCurrentAdmin } from "@/lib/session";
+import { validateInstructor } from "@/lib/instructors";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
@@ -12,6 +13,7 @@ const schema = z.object({
   priceUSD: z.number().min(0),
   certifying: z.boolean(),
   instructor: z.string().optional(),
+  instructorId: z.string().nullable().optional(),
 });
 
 export async function GET() {
@@ -34,6 +36,9 @@ export async function POST(req: Request) {
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
   }
+
+  const instructorError = await validateInstructor(parsed.data.instructorId);
+  if (instructorError) return NextResponse.json({ error: instructorError }, { status: 400 });
 
   const course = await prisma.course.create({ data: parsed.data });
   return NextResponse.json(course, { status: 201 });

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 type Category = { id: string; name: string };
+type Teacher = { id: string; name: string; email: string };
 
 type CourseData = {
   id?: string;
@@ -15,6 +16,7 @@ type CourseData = {
   priceUSD: number;
   certifying: boolean;
   instructor: string;
+  instructorId?: string; // "" = aucun compte lié
 };
 
 const emptyCourse: CourseData = {
@@ -26,15 +28,19 @@ const emptyCourse: CourseData = {
   priceUSD: 0,
   certifying: false,
   instructor: "",
+  instructorId: "",
 };
 
 export default function CourseForm({
   categories,
+  teachers,
   initial,
   apiBase = "/api/admin",
   redirectBase = "/admin/courses",
 }: {
   categories: Category[];
+  /** Fourni uniquement côté admin : permet de lier un vrai compte formateur. */
+  teachers?: Teacher[];
   initial?: CourseData;
   apiBase?: string;
   redirectBase?: string;
@@ -53,10 +59,18 @@ export default function CourseForm({
     setError("");
     setSaved(false);
 
-    const payload = {
+    const payload: Record<string, unknown> = {
       ...data,
       priceUSD: Math.round(Number(data.priceUSD) * 100), // dollars -> cents
     };
+
+    // Le lien vers un compte formateur n'est modifiable que depuis l'espace admin :
+    // ailleurs, on ne l'envoie pas du tout pour ne pas risquer de le réattribuer.
+    if (teachers) {
+      payload.instructorId = data.instructorId ? data.instructorId : null;
+    } else {
+      delete payload.instructorId;
+    }
 
     const res = await fetch(isEditing ? `${apiBase}/courses/${initial!.id}` : `${apiBase}/courses`, {
       method: isEditing ? "PATCH" : "POST",
@@ -156,7 +170,7 @@ export default function CourseForm({
           />
         </Field>
 
-        <Field label="Formateur (optionnel)">
+        <Field label="Formateur — nom affiché (optionnel)">
           <input
             value={data.instructor}
             onChange={(e) => setData({ ...data, instructor: e.target.value })}
@@ -164,6 +178,28 @@ export default function CourseForm({
           />
         </Field>
       </div>
+
+      {teachers && (
+        <Field label="Compte formateur lié">
+          <select
+            value={data.instructorId ?? ""}
+            onChange={(e) => setData({ ...data, instructorId: e.target.value })}
+            className="input"
+          >
+            <option value="">— Aucun compte lié —</option>
+            {teachers.map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.name} ({t.email})
+              </option>
+            ))}
+          </select>
+          <p className="text-xs text-brand-slate/60 mt-1.5">
+            {teachers.length === 0
+              ? "Aucun compte n'a le rôle Formateur pour l'instant. Attribue ce rôle depuis « Utilisateurs »."
+              : "Nécessaire pour que les étudiants inscrits puissent écrire au formateur depuis la page de la formation."}
+          </p>
+        </Field>
+      )}
 
       <label className="flex items-center gap-2 text-sm text-brand-slate">
         <input
