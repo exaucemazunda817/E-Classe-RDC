@@ -27,7 +27,7 @@ export default function Footer() {
           <ul className="space-y-3 text-sm">
             <li><a href="#" className="text-white/70 hover:text-white">Centre d'aide</a></li>
             <li><a href="#" className="text-white/70 hover:text-white">Contact</a></li>
-            <li><a href="#" className="text-white/70 hover:text-white">Conditions d'utilisation</a></li>
+            <li><Link href="/terms" className="text-white/70 hover:text-white">Conditions d'utilisation</Link></li>
           </ul>
         </div>
       </div>
