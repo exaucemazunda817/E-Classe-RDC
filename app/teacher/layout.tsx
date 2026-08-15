@@ -22,7 +22,9 @@ export default async function TeacherLayout({ children }: { children: React.Reac
     <div className="min-h-screen flex">
       <aside className="hidden md:flex md:w-60 shrink-0 bg-brand-navy flex-col">
         <div className="h-16 flex items-center px-6 border-b border-white/10">
-          <Logo variant="light" />
+          <Link href="/">
+            <Logo variant="light" />
+          </Link>
         </div>
         <nav className="flex-1 px-3 py-6 space-y-1">
           {navItems.map((item) => (
@@ -44,7 +46,9 @@ export default async function TeacherLayout({ children }: { children: React.Reac
 
       <div className="flex-1 min-w-0">
         <header className="md:hidden h-16 bg-brand-navy flex items-center justify-between px-6 border-b border-white/10">
-          <Logo variant="light" />
+          <Link href="/">
+            <Logo variant="light" />
+          </Link>
           <SignOutButton />
         </header>
 
