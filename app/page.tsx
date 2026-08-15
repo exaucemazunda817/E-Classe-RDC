@@ -173,6 +173,32 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* ---------- DEVENIR FORMATEUR ---------- */}
+      <section className="mx-auto max-w-6xl px-6 py-4">
+        <div className="rounded-3xl border border-brand-line bg-white px-8 py-10 md:px-12 md:py-12 flex flex-col md:flex-row items-center gap-8">
+          <div className="w-14 h-14 rounded-2xl bg-brand-orange/10 flex items-center justify-center shrink-0">
+            <IconGraduationCap className="w-7 h-7 text-brand-orange" />
+          </div>
+          <div className="flex-1 text-center md:text-left">
+            <p className="eyebrow text-brand-orange mb-2">Rejoindre l'équipe</p>
+            <h2 className="font-display text-xl md:text-2xl font-extrabold text-brand-navy">
+              Vous avez une expertise à partager ?
+            </h2>
+            <p className="text-brand-slate/70 mt-2 max-w-lg">
+              Devenez formateur sur E-Classe RDC et transmettez votre savoir à des milliers
+              d'apprenants congolais.
+            </p>
+          </div>
+          <Link
+            href="/devenir-formateur"
+            className="inline-flex items-center gap-2 bg-brand-navy hover:bg-brand-navy/90 transition-colors text-white font-semibold px-6 py-3.5 rounded-full shrink-0 whitespace-nowrap"
+          >
+            Devenir formateur
+            <IconArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+      </section>
+
       {/* ---------- CTA FINAL ---------- */}
       <section className="mx-auto max-w-6xl px-6 py-20">
         <div className="rounded-3xl bg-brand-blue px-8 py-14 md:px-16 text-center relative overflow-hidden">
