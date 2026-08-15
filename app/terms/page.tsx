@@ -14,15 +14,17 @@ export default function TermsPage() {
         <h1 className="font-display text-3xl md:text-4xl font-extrabold text-brand-navy mb-2">
           Conditions d'utilisation
         </h1>
-        <p className="text-sm text-brand-slate/60 mb-12">Dernière mise à jour : [à compléter]</p>
+        <p className="text-sm text-brand-slate/60 mb-12">Dernière mise à jour : 12 août 2026</p>
 
         <div className="space-y-10 text-sm text-brand-slate/80 leading-relaxed">
           <Article number="1" title="Objet">
             <p>
               Les présentes Conditions d'utilisation régissent l'accès et l'utilisation de la
               plateforme E-Classe RDC (le « Site »), accessible à l'adresse{" "}
-              <span className="font-semibold text-brand-navy">[URL du site]</span>, éditée par{" "}
-              <span className="font-semibold text-brand-navy">[nom / raison sociale de l'éditeur]</span>.
+              <span className="font-semibold text-brand-navy">
+                https://e-classe-rdc-en69.vercel.app
+              </span>
+              , éditée par <span className="font-semibold text-brand-navy">E-Classe RDC</span>.
               En créant un compte ou en utilisant le Site, vous acceptez sans réserve les présentes
               conditions. Si vous n'acceptez pas ces conditions, vous ne devez pas utiliser le Site.
             </p>
@@ -72,10 +74,10 @@ export default function TermsPage() {
                 renouvellement automatique n'a lieu sans une action explicite de votre part.
               </li>
               <li>
-                <span className="font-semibold text-brand-navy">Remboursement :</span> [à compléter —
-                par exemple : « Une formation à l'unité n'est pas remboursable une fois l'accès
-                débloqué. Un abonnement peut être annulé à tout moment ; l'accès reste actif jusqu'à
-                la fin de la période déjà payée. » Décrivez ici votre politique réelle.]
+                <span className="font-semibold text-brand-navy">Remboursement :</span> une formation
+                achetée à l'unité n'est pas remboursable une fois l'accès débloqué. Un abonnement peut
+                être annulé à tout moment depuis votre espace personnel ; l'accès reste actif jusqu'à
+                la fin de la période déjà payée, sans reconduction ni prélèvement supplémentaire.
               </li>
             </ul>
           </Article>
@@ -136,11 +138,9 @@ export default function TermsPage() {
               adresse email, historique de progression, certificats obtenus et informations de
               paiement transmises par le prestataire tiers (hors coordonnées bancaires). Ces données
               ne sont ni vendues ni transmises à des tiers en dehors de ce qui est strictement
-              nécessaire au fonctionnement du service (ex. prestataire de paiement).{" "}
-              <span className="font-semibold text-brand-navy">
-                [Une politique de confidentialité dédiée, plus détaillée, est recommandée en
-                complément de cette section.]
-              </span>
+              nécessaire au fonctionnement du service (ex. prestataire de paiement). Vous pouvez à
+              tout moment demander l'accès, la correction ou la suppression de vos données en nous
+              contactant à l'adresse indiquée à l'article 14.
             </p>
           </Article>
 
@@ -180,7 +180,13 @@ export default function TermsPage() {
           <Article number="14" title="Contact">
             <p>
               Pour toute question relative à ces conditions, vous pouvez nous écrire à{" "}
-              <span className="font-semibold text-brand-navy">[email de contact]</span>.
+              <a
+                href="mailto:exaucemazunda817@gmail.com"
+                className="font-semibold text-brand-blue hover:underline"
+              >
+                exaucemazunda817@gmail.com
+              </a>
+              .
             </p>
           </Article>
         </div>
