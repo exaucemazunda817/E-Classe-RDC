@@ -19,6 +19,7 @@ export default function Footer() {
             <li><Link href="/courses" className="text-white/70 hover:text-white">Formations</Link></li>
             <li><Link href="/categories" className="text-white/70 hover:text-white">Catégories</Link></li>
             <li><Link href="/register" className="text-white/70 hover:text-white">Créer un compte</Link></li>
+            <li><Link href="/devenir-formateur" className="text-white/70 hover:text-white">Devenir formateur</Link></li>
           </ul>
         </div>
 

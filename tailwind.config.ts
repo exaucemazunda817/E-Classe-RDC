@@ -24,6 +24,9 @@ const config: Config = {
       borderRadius: {
         xl2: "1.25rem",
       },
+      spacing: {
+        4.5: "1.125rem", // utilisé pour les icônes de taille intermédiaire (w-4.5/h-4.5)
+      },
     },
   },
   plugins: [],

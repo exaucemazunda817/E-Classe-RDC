@@ -1,22 +1,33 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/session";
+import { prisma } from "@/lib/prisma";
 import Logo from "@/components/Logo";
 import SignOutButton from "@/components/SignOutButton";
-import { IconGrid, IconBookOpen, IconHome, IconUsers } from "@/lib/icons";
-
-const navItems = [
-  { href: "/admin", label: "Tableau de bord", Icon: IconHome },
-  { href: "/admin/courses", label: "Formations", Icon: IconBookOpen },
-  { href: "/admin/categories", label: "Catégories", Icon: IconGrid },
-  { href: "/admin/users", label: "Utilisateurs", Icon: IconUsers },
-];
+import { IconGrid, IconBookOpen, IconHome, IconUsers, IconFileText } from "@/lib/icons";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();
 
   if (!user) redirect("/login");
   if (user.role !== "ADMIN") redirect("/");
+
+  const pendingApplications = await prisma.teacherApplication.count({
+    where: { status: "PENDING" },
+  });
+
+  const navItems = [
+    { href: "/admin", label: "Tableau de bord", Icon: IconHome },
+    { href: "/admin/courses", label: "Formations", Icon: IconBookOpen },
+    { href: "/admin/categories", label: "Catégories", Icon: IconGrid },
+    { href: "/admin/users", label: "Utilisateurs", Icon: IconUsers },
+    {
+      href: "/admin/teacher-applications",
+      label: "Candidatures",
+      Icon: IconFileText,
+      badge: pendingApplications,
+    },
+  ];
 
   return (
     <div className="min-h-screen flex">
@@ -35,6 +46,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             >
               <item.Icon className="w-4.5 h-4.5" />
               {item.label}
+              {!!item.badge && (
+                <span className="ml-auto bg-brand-orange text-white text-[10px] font-bold w-4.5 h-4.5 rounded-full flex items-center justify-center">
+                  {item.badge}
+                </span>
+              )}
             </Link>
           ))}
         </nav>
@@ -58,9 +74,14 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <Link
               key={item.href}
               href={item.href}
-              className="shrink-0 text-xs font-semibold text-brand-navy bg-brand-line/50 px-3 py-1.5 rounded-full"
+              className="shrink-0 flex items-center gap-1.5 text-xs font-semibold text-brand-navy bg-brand-line/50 px-3 py-1.5 rounded-full"
             >
               {item.label}
+              {!!item.badge && (
+                <span className="bg-brand-orange text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                  {item.badge}
+                </span>
+              )}
             </Link>
           ))}
         </nav>

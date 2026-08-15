@@ -78,6 +78,7 @@ model Category {
   name      String
   icon      String?  // nom d'icône ou emoji
   courses   Course[]
+  teacherApplications TeacherApplication[]
 }
 
 model Course {
@@ -226,4 +227,35 @@ model Message {
   content        String
   read           Boolean      @default(false)
   createdAt      DateTime     @default(now())
+}
+
+// ---------------- CANDIDATURES FORMATEUR ----------------
+
+// Formulaire public "devenir formateur" : accessible sans compte, examiné
+// par l'admin dans /admin/teacher-applications. Le CV est stocké directement
+// en base (petit volume attendu, évite de dépendre d'un service de stockage
+// de fichiers tiers).
+model TeacherApplication {
+  id           String            @id @default(cuid())
+  fullName     String
+  email        String
+  phone        String?
+  categoryId   String
+  category     Category          @relation(fields: [categoryId], references: [id])
+  experience   String            // résumé de l'expérience / des qualifications
+  motivation   String
+  portfolioUrl String?           // lien optionnel (LinkedIn, portfolio, chaîne YouTube...)
+  cvFileName   String
+  cvMimeType   String
+  cvData       Bytes
+  status       ApplicationStatus @default(PENDING)
+  adminNote    String?           // motif interne en cas de refus
+  createdAt    DateTime          @default(now())
+  reviewedAt   DateTime?
+}
+
+enum ApplicationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
 }
