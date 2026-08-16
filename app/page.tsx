@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import CategoryCard from "@/components/CategoryCard";
 import CourseCard from "@/components/CourseCard";
 import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/session";
 import {
   IconCode,
   IconBriefcase,
@@ -27,7 +28,8 @@ const categoryIcons: Record<string, any> = {
 };
 
 export default async function HomePage() {
-  const [categories, courses] = await Promise.all([
+  const [user, categories, courses] = await Promise.all([
+    getCurrentUser(),
     prisma.category.findMany({ include: { _count: { select: { courses: true } } } }),
     prisma.course.findMany({
       take: 3,
@@ -72,12 +74,14 @@ export default async function HomePage() {
               Explorer les formations
               <IconArrowRight className="w-4 h-4" />
             </Link>
-            <Link
-              href="/register"
-              className="inline-flex items-center gap-2 text-white font-semibold px-5 sm:px-6 py-3 sm:py-3.5 rounded-full border border-white/25 hover:bg-white/5 transition-colors text-sm sm:text-base"
-            >
-              Créer un compte gratuit
-            </Link>
+            {!user && (
+              <Link
+                href="/register"
+                className="inline-flex items-center gap-2 text-white font-semibold px-5 sm:px-6 py-3 sm:py-3.5 rounded-full border border-white/25 hover:bg-white/5 transition-colors text-sm sm:text-base"
+              >
+                Créer un compte gratuit
+              </Link>
+            )}
           </div>
         </div>
 
@@ -207,13 +211,15 @@ export default async function HomePage() {
             Prêt à progresser dans votre carrière ?
           </h2>
           <p className="text-white/70 mt-3 max-w-md mx-auto">
-            Rejoignez des milliers d'apprenants congolais qui se forment chaque jour.
+            {user
+              ? "Continue ta progression dans tes formations en cours."
+              : "Rejoignez des milliers d'apprenants congolais qui se forment chaque jour."}
           </p>
           <Link
-            href="/register"
+            href={user ? "/account/courses" : "/register"}
             className="inline-flex items-center gap-2 bg-white text-brand-blue font-semibold px-6 py-3.5 rounded-full mt-7 hover:bg-white/90 transition-colors"
           >
-            Commencer maintenant
+            {user ? "Voir mes formations" : "Commencer maintenant"}
             <IconArrowRight className="w-4 h-4" />
           </Link>
         </div>
