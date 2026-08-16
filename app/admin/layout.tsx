@@ -4,7 +4,14 @@ import { getCurrentUser } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import Logo from "@/components/Logo";
 import SignOutButton from "@/components/SignOutButton";
-import { IconGrid, IconBookOpen, IconHome, IconUsers, IconFileText } from "@/lib/icons";
+import {
+  IconGrid,
+  IconBookOpen,
+  IconHome,
+  IconUsers,
+  IconFileText,
+  IconMessageCircle,
+} from "@/lib/icons";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();
@@ -12,9 +19,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   if (!user) redirect("/login");
   if (user.role !== "ADMIN") redirect("/");
 
-  const pendingApplications = await prisma.teacherApplication.count({
-    where: { status: "PENDING" },
-  });
+  const [pendingApplications, unreadContactMessages] = await Promise.all([
+    prisma.teacherApplication.count({ where: { status: "PENDING" } }),
+    prisma.contactMessage.count({ where: { read: false } }),
+  ]);
 
   const navItems = [
     { href: "/admin", label: "Tableau de bord", Icon: IconHome },
@@ -26,6 +34,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       label: "Candidatures",
       Icon: IconFileText,
       badge: pendingApplications,
+    },
+    {
+      href: "/admin/contact-messages",
+      label: "Contact",
+      Icon: IconMessageCircle,
+      badge: unreadContactMessages,
     },
   ];
 
