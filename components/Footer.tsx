@@ -26,7 +26,7 @@ export default function Footer() {
         <div>
           <p className="eyebrow text-white/40 mb-4">Support</p>
           <ul className="space-y-3 text-sm">
-            <li><a href="#" className="text-white/70 hover:text-white">Centre d'aide</a></li>
+            <li><Link href="/help" className="text-white/70 hover:text-white">Centre d'aide</Link></li>
             <li><Link href="/contact" className="text-white/70 hover:text-white">Contact</Link></li>
             <li><Link href="/terms" className="text-white/70 hover:text-white">Conditions d'utilisation</Link></li>
           </ul>
