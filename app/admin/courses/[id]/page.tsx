@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import CourseForm from "@/components/admin/CourseForm";
 import LessonManager from "@/components/admin/LessonManager";
 import CourseResourceManager from "@/components/admin/CourseResourceManager";
+import ExerciseList from "@/components/admin/ExerciseList";
 
 export default async function EditCoursePage({ params }: { params: { id: string } }) {
   const [course, categories, teachers] = await Promise.all([
@@ -12,6 +13,7 @@ export default async function EditCoursePage({ params }: { params: { id: string 
       include: {
         lessons: { orderBy: { order: "asc" } },
         resources: { orderBy: { createdAt: "desc" } },
+        exercises: { orderBy: { createdAt: "desc" }, include: { questions: true } },
       },
     }),
     prisma.category.findMany({ orderBy: { name: "asc" } }),
@@ -49,13 +51,27 @@ export default async function EditCoursePage({ params }: { params: { id: string 
         <LessonManager courseId={course.id} lessons={course.lessons} />
       </section>
 
-      <section>
-        <h2 className="font-display text-lg font-bold text-brand-navy mb-1">Ressources et exercices</h2>
+      <section className="mb-12">
+        <h2 className="font-display text-lg font-bold text-brand-navy mb-1">Documents</h2>
         <p className="text-sm text-brand-slate/60 mb-4">
-          Documents (PDF, Word) mis à disposition des apprenants inscrits : supports de cours,
-          questionnaires, fiches d'exercices.
+          Fichiers PDF ou Word mis à disposition des apprenants inscrits : supports de cours, notes.
         </p>
         <CourseResourceManager courseId={course.id} resources={course.resources} />
+      </section>
+
+      <section>
+        <h2 className="font-display text-lg font-bold text-brand-navy mb-1">Questionnaires et exercices</h2>
+        <p className="text-sm text-brand-slate/60 mb-4">
+          Rédige des questions (ouvertes ou à choix multiples) directement pour cette formation.
+        </p>
+        <ExerciseList
+          courseId={course.id}
+          exercises={course.exercises.map((ex) => ({
+            id: ex.id,
+            title: ex.title,
+            questionCount: ex.questions.length,
+          }))}
+        />
       </section>
     </>
   );

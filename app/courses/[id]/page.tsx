@@ -1,6 +1,7 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CoursePlayer from "@/components/CoursePlayer";
+import ExerciseViewer from "@/components/ExerciseViewer";
 import PurchaseCourseButton from "@/components/PurchaseCourseButton";
 import StartConversationButton from "@/components/messaging/StartConversationButton";
 import { prisma } from "@/lib/prisma";
@@ -17,6 +18,7 @@ export default async function CourseDetailPage({ params }: { params: { id: strin
       category: true,
       lessons: { orderBy: { order: "asc" } },
       resources: { orderBy: { createdAt: "asc" } },
+      exercises: { orderBy: { createdAt: "asc" }, include: { questions: { orderBy: { order: "asc" } } } },
       instructorUser: true,
     },
   });
@@ -103,9 +105,7 @@ export default async function CourseDetailPage({ params }: { params: { id: strin
 
         {enrollment && course.resources.length > 0 && (
           <div className="mt-10">
-            <h2 className="font-display text-xl font-bold text-brand-navy mb-5">
-              Ressources et exercices
-            </h2>
+            <h2 className="font-display text-xl font-bold text-brand-navy mb-5">Documents</h2>
             <div className="space-y-2">
               {course.resources.map((resource) => (
                 <a
@@ -116,12 +116,22 @@ export default async function CourseDetailPage({ params }: { params: { id: strin
                   <IconFileText className="w-4.5 h-4.5 text-brand-blue shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-brand-navy font-medium truncate">{resource.title}</p>
-                    <p className="text-xs text-brand-slate/50">
-                      {resource.kind === "EXERCISE" ? "Questionnaire / exercice" : "Document"}
-                    </p>
                   </div>
                   <IconDownload className="w-4 h-4 text-brand-slate/40 shrink-0" />
                 </a>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {enrollment && course.exercises.length > 0 && (
+          <div className="mt-10">
+            <h2 className="font-display text-xl font-bold text-brand-navy mb-5">
+              Questionnaires et exercices
+            </h2>
+            <div className="space-y-4">
+              {course.exercises.map((exercise) => (
+                <ExerciseViewer key={exercise.id} exercise={exercise} />
               ))}
             </div>
           </div>

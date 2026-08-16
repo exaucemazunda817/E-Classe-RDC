@@ -7,7 +7,6 @@ import { IconFileText, IconUpload } from "@/lib/icons";
 type Resource = {
   id: string;
   title: string;
-  kind: "DOCUMENT" | "EXERCISE";
   fileName: string;
   fileSize: number;
 };
@@ -27,7 +26,6 @@ export default function CourseResourceManager({
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [title, setTitle] = useState("");
-  const [kind, setKind] = useState<"DOCUMENT" | "EXERCISE">("DOCUMENT");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -44,7 +42,6 @@ export default function CourseResourceManager({
 
     const formData = new FormData();
     formData.set("title", title);
-    formData.set("kind", kind);
     formData.set("file", file);
 
     const res = await fetch(`/api/admin/courses/${courseId}/resources`, {
@@ -60,7 +57,6 @@ export default function CourseResourceManager({
     }
 
     setTitle("");
-    setKind("DOCUMENT");
     if (fileInputRef.current) fileInputRef.current.value = "";
     setLoading(false);
     router.refresh();
@@ -73,63 +69,50 @@ export default function CourseResourceManager({
     router.refresh();
   }
 
-  const documents = resources.filter((r) => r.kind === "DOCUMENT");
-  const exercises = resources.filter((r) => r.kind === "EXERCISE");
-
   return (
     <div>
-      {[
-        { label: "Documents / supports de cours", items: documents },
-        { label: "Questionnaires / exercices", items: exercises },
-      ].map((group) => (
-        <div key={group.label} className="mb-4">
-          <p className="text-xs font-semibold text-brand-slate/60 uppercase tracking-wide mb-2">
-            {group.label}
-          </p>
-          {group.items.length === 0 ? (
-            <p className="text-sm text-brand-slate/50 mb-2">Aucun fichier pour l'instant.</p>
-          ) : (
-            <div className="space-y-2 mb-2">
-              {group.items.map((r) => (
-                <div
-                  key={r.id}
-                  className="flex items-center gap-3 rounded-xl border border-brand-line bg-white px-4 py-3"
-                >
-                  <IconFileText className="w-4.5 h-4.5 text-brand-blue shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-brand-navy font-medium truncate">{r.title}</p>
-                    <p className="text-xs text-brand-slate/50 truncate">
-                      {r.fileName} · {formatSize(r.fileSize)}
-                    </p>
-                  </div>
-                  <a
-                    href={`/api/admin/resources/${r.id}/file`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-xs font-semibold text-brand-blue hover:text-brand-navy shrink-0"
-                  >
-                    Voir
-                  </a>
-                  <button
-                    onClick={() => handleDelete(r.id)}
-                    disabled={deletingId === r.id}
-                    className="text-xs font-semibold text-red-500 hover:text-red-600 shrink-0"
-                  >
-                    {deletingId === r.id ? "..." : "Retirer"}
-                  </button>
-                </div>
-              ))}
+      {resources.length === 0 ? (
+        <p className="text-sm text-brand-slate/50 mb-3">Aucun document pour l'instant.</p>
+      ) : (
+        <div className="space-y-2 mb-3">
+          {resources.map((r) => (
+            <div
+              key={r.id}
+              className="flex items-center gap-3 rounded-xl border border-brand-line bg-white px-4 py-3"
+            >
+              <IconFileText className="w-4.5 h-4.5 text-brand-blue shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm text-brand-navy font-medium truncate">{r.title}</p>
+                <p className="text-xs text-brand-slate/50 truncate">
+                  {r.fileName} · {formatSize(r.fileSize)}
+                </p>
+              </div>
+              <a
+                href={`/api/admin/resources/${r.id}/file`}
+                target="_blank"
+                rel="noreferrer"
+                className="text-xs font-semibold text-brand-blue hover:text-brand-navy shrink-0"
+              >
+                Voir
+              </a>
+              <button
+                onClick={() => handleDelete(r.id)}
+                disabled={deletingId === r.id}
+                className="text-xs font-semibold text-red-500 hover:text-red-600 shrink-0"
+              >
+                {deletingId === r.id ? "..." : "Retirer"}
+              </button>
             </div>
-          )}
+          ))}
         </div>
-      ))}
+      )}
 
       <form
         onSubmit={handleUpload}
         className="space-y-2 rounded-xl border border-dashed border-brand-line p-4"
       >
         <p className="text-xs font-semibold text-brand-slate/60 uppercase tracking-wide mb-1">
-          Ajouter un fichier
+          Ajouter un document
         </p>
         <input
           value={title}
@@ -137,10 +120,6 @@ export default function CourseResourceManager({
           placeholder="Titre (ex : Support de cours, Chapitre 1)"
           className="input"
         />
-        <select value={kind} onChange={(e) => setKind(e.target.value as "DOCUMENT" | "EXERCISE")} className="input">
-          <option value="DOCUMENT">Document / support de cours</option>
-          <option value="EXERCISE">Questionnaire / exercice</option>
-        </select>
         <input ref={fileInputRef} type="file" accept=".pdf,.doc,.docx" className="input" />
         <p className="text-xs text-brand-slate/50">PDF ou Word, 15 Mo maximum.</p>
 

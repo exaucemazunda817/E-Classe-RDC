@@ -102,6 +102,7 @@ model Course {
   certificates  Certificate[]
   conversations Conversation[]
   resources     CourseResource[]
+  exercises     Exercise[]
 }
 
 enum Level {
@@ -130,24 +131,40 @@ model Lesson {
 }
 
 // Documents (PDF/Word) attachés à une formation : supports de cours,
-// fiches d'exercices ou questionnaires. Stockés directement en base comme
-// les CV de candidature formateur, pour éviter un service de stockage tiers.
+// notes, fiches complémentaires. Stockés directement en base comme les CV
+// de candidature formateur, pour éviter un service de stockage tiers.
 model CourseResource {
-  id        String       @id @default(cuid())
+  id        String   @id @default(cuid())
   courseId  String
-  course    Course       @relation(fields: [courseId], references: [id])
-  kind      ResourceKind @default(DOCUMENT)
+  course    Course   @relation(fields: [courseId], references: [id])
   title     String
   fileName  String
   mimeType  String
   fileSize  Int
   fileData  Bytes
-  createdAt DateTime     @default(now())
+  createdAt DateTime @default(now())
 }
 
-enum ResourceKind {
-  DOCUMENT
-  EXERCISE
+// Questionnaire/exercice rédigé directement par l'admin (pas un fichier) :
+// un titre, des instructions optionnelles, et une liste de questions.
+model Exercise {
+  id           String             @id @default(cuid())
+  courseId     String
+  course       Course             @relation(fields: [courseId], references: [id])
+  title        String
+  instructions String?
+  createdAt    DateTime           @default(now())
+  questions    ExerciseQuestion[]
+}
+
+model ExerciseQuestion {
+  id            String   @id @default(cuid())
+  exerciseId    String
+  exercise      Exercise @relation(fields: [exerciseId], references: [id])
+  order         Int
+  question      String
+  choices       String[] // vide si question ouverte (sans choix multiples)
+  correctChoice Int?     // index dans "choices" ; null si question ouverte
 }
 
 // ---------------- PROGRESSION / INSCRIPTIONS ----------------

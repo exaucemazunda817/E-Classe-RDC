@@ -13,7 +13,6 @@ const ALLOWED_TYPES = [
 
 const fieldsSchema = z.object({
   title: z.string().trim().min(2, "Le titre est requis."),
-  kind: z.enum(["DOCUMENT", "EXERCISE"]),
 });
 
 export async function POST(req: Request, { params }: { params: { id: string } }) {
@@ -26,7 +25,6 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   const form = await req.formData();
   const parsed = fieldsSchema.safeParse({
     title: form.get("title"),
-    kind: form.get("kind"),
   });
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
@@ -51,14 +49,13 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   const resource = await prisma.courseResource.create({
     data: {
       courseId: course.id,
-      kind: parsed.data.kind,
       title: parsed.data.title,
       fileName: file.name || "document",
       mimeType: file.type,
       fileSize: file.size,
       fileData,
     },
-    select: { id: true, title: true, kind: true, fileName: true, fileSize: true, createdAt: true },
+    select: { id: true, title: true, fileName: true, fileSize: true, createdAt: true },
   });
 
   return NextResponse.json(resource, { status: 201 });

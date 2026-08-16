@@ -219,3 +219,21 @@ export function IconCheckCircle({ className }: IconProps) {
     </svg>
   );
 }
+
+export function IconClipboardList({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" {...base}>
+      <rect x="5" y="4" width="14" height="18" rx="2" />
+      <path d="M9 2.5h6a1 1 0 0 1 1 1V5H8V3.5a1 1 0 0 1 1-1z" />
+      <path d="M8.5 11h.01M8.5 15h.01M11.5 11h4M11.5 15h4" />
+    </svg>
+  );
+}
+
+export function IconX({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" {...base}>
+      <path d="M6 6l12 12M18 6L6 18" />
+    </svg>
+  );
+}
