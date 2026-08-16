@@ -101,6 +101,7 @@ model Course {
   enrollments   Enrollment[]
   certificates  Certificate[]
   conversations Conversation[]
+  resources     CourseResource[]
 }
 
 enum Level {
@@ -126,6 +127,27 @@ model Lesson {
   content   String?
 
   completions LessonCompletion[]
+}
+
+// Documents (PDF/Word) attachés à une formation : supports de cours,
+// fiches d'exercices ou questionnaires. Stockés directement en base comme
+// les CV de candidature formateur, pour éviter un service de stockage tiers.
+model CourseResource {
+  id        String       @id @default(cuid())
+  courseId  String
+  course    Course       @relation(fields: [courseId], references: [id])
+  kind      ResourceKind @default(DOCUMENT)
+  title     String
+  fileName  String
+  mimeType  String
+  fileSize  Int
+  fileData  Bytes
+  createdAt DateTime     @default(now())
+}
+
+enum ResourceKind {
+  DOCUMENT
+  EXERCISE
 }
 
 // ---------------- PROGRESSION / INSCRIPTIONS ----------------
