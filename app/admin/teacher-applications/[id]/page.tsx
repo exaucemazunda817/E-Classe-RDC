@@ -57,7 +57,14 @@ export default async function TeacherApplicationDetailPage({
       <div className="grid sm:grid-cols-2 gap-4 mb-6">
         <InfoBlock label="Email" value={application.email} />
         <InfoBlock label="Téléphone" value={application.phone || "—"} />
-        <InfoBlock label="Domaine souhaité" value={application.category.name} />
+        <InfoBlock
+          label="Domaine souhaité"
+          value={
+            application.category
+              ? application.category.name
+              : `${application.customDomain} (hors liste)`
+          }
+        />
         <InfoBlock
           label="Compte existant sur la plateforme"
           value={existingUser ? `Oui (rôle actuel : ${existingUser.role})` : "Non, pas encore inscrit"}

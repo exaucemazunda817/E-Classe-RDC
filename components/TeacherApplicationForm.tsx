@@ -7,12 +7,16 @@ type Category = { id: string; name: string };
 
 const MAX_CV_BYTES = 4 * 1024 * 1024;
 
+const OTHER_VALUE = "__other__";
+
 export default function TeacherApplicationForm({ categories }: { categories: Category[] }) {
   const [cvFile, setCvFile] = useState<File | null>(null);
   const [agreed, setAgreed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [done, setDone] = useState(false);
+  const [categorySelection, setCategorySelection] = useState("");
+  const [customDomain, setCustomDomain] = useState("");
 
   function handleCvChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0] ?? null;
@@ -47,10 +51,22 @@ export default function TeacherApplicationForm({ categories }: { categories: Cat
       setError("Merci de confirmer que tu remplis les conditions d'éligibilité.");
       return;
     }
+    if (!categorySelection) {
+      setError("Merci de choisir un domaine.");
+      return;
+    }
+    if (categorySelection === OTHER_VALUE && !customDomain.trim()) {
+      setError("Merci de préciser ton domaine.");
+      return;
+    }
 
     setLoading(true);
     const formData = new FormData(e.currentTarget);
     formData.set("cv", cvFile);
+    if (categorySelection === OTHER_VALUE) {
+      formData.delete("categoryId");
+      formData.set("customDomain", customDomain.trim());
+    }
 
     try {
       const res = await fetch("/api/teacher-applications", { method: "POST", body: formData });
@@ -100,7 +116,13 @@ export default function TeacherApplicationForm({ categories }: { categories: Cat
           <input name="phone" className="input" placeholder="+243 ..." />
         </Field>
         <Field label="Domaine que tu souhaites enseigner *">
-          <select name="categoryId" required className="input" defaultValue="">
+          <select
+            name="categoryId"
+            required
+            className="input"
+            value={categorySelection}
+            onChange={(e) => setCategorySelection(e.target.value)}
+          >
             <option value="" disabled>
               Choisis un domaine
             </option>
@@ -109,9 +131,22 @@ export default function TeacherApplicationForm({ categories }: { categories: Cat
                 {c.name}
               </option>
             ))}
+            <option value={OTHER_VALUE}>Autre</option>
           </select>
         </Field>
       </div>
+
+      {categorySelection === OTHER_VALUE && (
+        <Field label="Précise ton domaine *">
+          <input
+            value={customDomain}
+            onChange={(e) => setCustomDomain(e.target.value)}
+            required
+            className="input"
+            placeholder="Ex : Photographie, Couture, Agriculture..."
+          />
+        </Field>
+      )}
 
       <Field label="Ton expérience / tes qualifications dans ce domaine *">
         <textarea

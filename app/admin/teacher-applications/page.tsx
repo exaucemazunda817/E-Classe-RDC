@@ -44,7 +44,7 @@ export default async function TeacherApplicationsPage() {
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold text-sm text-brand-navy truncate">{a.fullName}</p>
                   <p className="text-xs text-brand-slate/50 mt-0.5 truncate">
-                    {a.category.name} • {a.email}
+                    {a.category?.name ?? `${a.customDomain} (autre)`} • {a.email}
                   </p>
                 </div>
                 <span className="text-xs text-brand-slate/40 shrink-0">

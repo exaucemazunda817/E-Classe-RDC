@@ -240,8 +240,9 @@ model TeacherApplication {
   fullName     String
   email        String
   phone        String?
-  categoryId   String
-  category     Category          @relation(fields: [categoryId], references: [id])
+  categoryId   String?           // null si le candidat a choisi "Autre"
+  category     Category?         @relation(fields: [categoryId], references: [id])
+  customDomain String?           // domaine saisi librement quand categoryId est null
   experience   String            // résumé de l'expérience / des qualifications
   motivation   String
   portfolioUrl String?           // lien optionnel (LinkedIn, portfolio, chaîne YouTube...)
