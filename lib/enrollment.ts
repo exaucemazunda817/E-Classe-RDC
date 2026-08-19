@@ -1,7 +1,12 @@
 import { prisma } from "./prisma";
 
+export class PaymentRequiredError extends Error {}
+
 /**
  * Inscrit un utilisateur à une formation (ne fait rien si déjà inscrit).
+ * Ne vérifie aucun paiement : réservée aux appels déjà autorisés (flux de
+ * paiement une fois le paiement vérifié). Pour une inscription à l'initiative
+ * de l'utilisateur, utiliser selfEnrollInCourse ci-dessous.
  */
 export async function enrollUserInCourse(userId: string, courseId: string) {
   const existing = await prisma.enrollment.findUnique({
@@ -12,6 +17,31 @@ export async function enrollUserInCourse(userId: string, courseId: string) {
   return prisma.enrollment.create({
     data: { userId, courseId },
   });
+}
+
+/**
+ * Inscrit un utilisateur à sa propre initiative (bouton "S'inscrire",
+ * complétion de leçon). Contrairement à enrollUserInCourse, refuse l'accès
+ * à une formation payante tant qu'aucun paiement réussi n'existe pour cet
+ * utilisateur et cette formation — sans quoi n'importe quel utilisateur
+ * connecté pourrait débloquer une formation payante sans jamais payer.
+ */
+export async function selfEnrollInCourse(userId: string, courseId: string) {
+  const course = await prisma.course.findUnique({ where: { id: courseId } });
+  if (!course) throw new Error("Formation introuvable");
+
+  if (course.priceUSD > 0) {
+    const existingPayment = await prisma.payment.findFirst({
+      where: { userId, purpose: `course:${courseId}`, status: "SUCCESS" },
+    });
+    if (!existingPayment) {
+      throw new PaymentRequiredError(
+        "Cette formation est payante. Achète-la avant de t'inscrire."
+      );
+    }
+  }
+
+  return enrollUserInCourse(userId, courseId);
 }
 
 /**
@@ -26,7 +56,7 @@ export async function completeLessonForUser(userId: string, lessonId: string) {
   });
   if (!lesson) throw new Error("Leçon introuvable");
 
-  const enrollment = await enrollUserInCourse(userId, lesson.courseId);
+  const enrollment = await selfEnrollInCourse(userId, lesson.courseId);
 
   // Enregistre la complétion (ignore si déjà fait, grâce à la contrainte unique)
   await prisma.lessonCompletion.upsert({
