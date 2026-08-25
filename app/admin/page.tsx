@@ -8,17 +8,17 @@ export default async function AdminDashboard() {
     prisma.certificate.count(),
     prisma.payment.aggregate({
       where: { status: "SUCCESS" },
-      _sum: { amountUSD: true },
+      _sum: { amountCDF: true },
     }),
   ]);
 
-  const revenueUSD = (revenueAgg._sum.amountUSD ?? 0) / 100;
+  const revenueCDF = revenueAgg._sum.amountCDF ?? 0;
 
   const stats = [
     { label: "Apprenants", value: userCount, Icon: IconUsers },
     { label: "Formations", value: courseCount, Icon: IconBookOpen },
     { label: "Certificats délivrés", value: certCount, Icon: IconMedal },
-    { label: "Revenus", value: `${revenueUSD.toFixed(2)} $`, Icon: IconCreditCard },
+    { label: "Revenus", value: `${revenueCDF.toLocaleString("fr-FR")} FC`, Icon: IconCreditCard },
   ];
 
   return (

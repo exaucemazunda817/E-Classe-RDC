@@ -42,7 +42,7 @@ export default async function TeacherCoursePage({ params }: { params: { id: stri
             <span>{course.category.name}</span>
             <span>{LEVEL_LABELS[course.level] ?? course.level}</span>
             <span className="font-display font-bold text-brand-navy">
-              {course.priceUSD === 0 ? "Gratuit" : `${(course.priceUSD / 100).toFixed(2)} $`}
+              {course.priceCDF === 0 ? "Gratuit" : `${course.priceCDF.toLocaleString("fr-FR")} FC`}
             </span>
             {course.certifying && (
               <span className="flex items-center gap-1.5 text-brand-orange font-semibold">

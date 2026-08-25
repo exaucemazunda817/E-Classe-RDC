@@ -47,7 +47,7 @@ enum Role {
 model Plan {
   id            String   @id @default(cuid())
   name          String   // "Gratuit", "PRO", "Expert"
-  priceUSD      Int      // prix en cents (ex: 999 = 9.99$)
+  priceCDF      Int      // prix en Francs Congolais (unité entière, pas de centimes)
   durationDays  Int      // durée de l'abonnement
   description   String?
   subscriptions Subscription[]
@@ -88,7 +88,7 @@ model Course {
   coverImage    String?
   level         Level    @default(DEBUTANT)
   type          CourseType @default(GRATUITE)
-  priceUSD      Int      @default(0) // 0 si gratuite
+  priceCDF      Int      @default(0) // prix en Francs Congolais, 0 si gratuite
   certifying    Boolean  @default(false)
   instructor    String?  // nom affiché (libre, si pas de compte formateur lié)
   instructorId  String?  // lié à un compte utilisateur de rôle FORMATEUR
@@ -217,16 +217,17 @@ model Payment {
   id            String   @id @default(cuid())
   userId        String
   user          User     @relation(fields: [userId], references: [id])
-  amountUSD     Int
+  amountCDF     Int
   provider      PaymentProvider
-  channel       String?  // ex: "OM" (Orange Money), "MOMO", "VISA" — renvoyé par CinetPay
-  providerRef   String?  // référence transaction CinetPay/Stripe
+  channel       String?  // ex: "OM" (Orange Money), "MOMO", "VISA" — renvoyé par le prestataire
+  providerRef   String?  // référence transaction (id Moneroo, opérateur CinetPay...)
   status        PaymentStatus @default(PENDING)
   purpose       String   // "subscription:<planId>" ou "course:<courseId>"
   createdAt     DateTime @default(now())
 }
 
 enum PaymentProvider {
+  MONEROO
   CINETPAY
   STRIPE
 }

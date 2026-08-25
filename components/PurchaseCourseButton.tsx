@@ -5,11 +5,11 @@ import { useRouter } from "next/navigation";
 
 export default function PurchaseCourseButton({
   courseId,
-  priceUSD,
+  priceCDF,
   isLoggedIn,
 }: {
   courseId: string;
-  priceUSD: number;
+  priceCDF: number;
   isLoggedIn: boolean;
 }) {
   const router = useRouter();
@@ -52,7 +52,7 @@ export default function PurchaseCourseButton({
         {loading
           ? "Redirection..."
           : isLoggedIn
-          ? `Acheter — ${(priceUSD / 100).toFixed(2)} $`
+          ? `Acheter — ${priceCDF.toLocaleString("fr-FR")} FC`
           : "Se connecter pour acheter"}
       </button>
       {error && <p className="text-red-500 text-xs mt-2">{error}</p>}

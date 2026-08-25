@@ -47,7 +47,7 @@ export default async function TeacherDashboard() {
                 </p>
               </div>
               <span className="text-xs font-semibold text-brand-slate/60 shrink-0">
-                {c.priceUSD === 0 ? "Gratuit" : `${(c.priceUSD / 100).toFixed(2)} $`}
+                {c.priceCDF === 0 ? "Gratuit" : `${c.priceCDF.toLocaleString("fr-FR")} FC`}
               </span>
               <Link
                 href={`/teacher/courses/${c.id}`}

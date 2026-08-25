@@ -30,7 +30,7 @@ export async function selfEnrollInCourse(userId: string, courseId: string) {
   const course = await prisma.course.findUnique({ where: { id: courseId } });
   if (!course) throw new Error("Formation introuvable");
 
-  if (course.priceUSD > 0) {
+  if (course.priceCDF > 0) {
     const existingPayment = await prisma.payment.findFirst({
       where: { userId, purpose: `course:${courseId}`, status: "SUCCESS" },
     });

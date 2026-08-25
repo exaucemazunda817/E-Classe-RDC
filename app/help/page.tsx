@@ -29,7 +29,7 @@ const FAQ_SECTIONS: { title: string; items: { q: string; a: string }[] }[] = [
     items: [
       {
         q: "Quels moyens de paiement sont acceptés ?",
-        a: "Le mobile money (Orange Money, Airtel Money, M-Pesa) ainsi que la carte bancaire, selon les moyens disponibles au moment du paiement.",
+        a: "Le mobile money (Orange Money, Airtel Money, Vodacom) ainsi que la carte bancaire, selon les moyens disponibles au moment du paiement.",
       },
       {
         q: "Puis-je me faire rembourser une formation achetée ?",

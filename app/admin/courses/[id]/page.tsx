@@ -38,7 +38,7 @@ export default async function EditCoursePage({ params }: { params: { id: string 
             categoryId: course.categoryId,
             level: course.level,
             type: course.type,
-            priceUSD: course.priceUSD / 100,
+            priceCDF: course.priceCDF,
             certifying: course.certifying,
             instructor: course.instructor ?? "",
             instructorId: course.instructorId ?? "",

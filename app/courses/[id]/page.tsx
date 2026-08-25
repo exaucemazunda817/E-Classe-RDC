@@ -65,7 +65,7 @@ export default async function CourseDetailPage({ params }: { params: { id: strin
               </span>
             )}
             <span className="font-display font-bold text-white">
-              {course.priceUSD === 0 ? "Gratuit" : `${(course.priceUSD / 100).toFixed(2)} $`}
+              {course.priceCDF === 0 ? "Gratuit" : `${course.priceCDF.toLocaleString("fr-FR")} FC`}
             </span>
           </div>
         </div>
@@ -78,7 +78,7 @@ export default async function CourseDetailPage({ params }: { params: { id: strin
           <p className="text-sm text-brand-slate/60">
             Le contenu de cette formation sera bientôt disponible.
           </p>
-        ) : course.priceUSD > 0 && !enrollment ? (
+        ) : course.priceCDF > 0 && !enrollment ? (
           <div>
             <p className="text-sm text-brand-slate/60 mb-4">
               Cette formation est payante. Achète-la pour débloquer les {course.lessons.length}{" "}
@@ -86,7 +86,7 @@ export default async function CourseDetailPage({ params }: { params: { id: strin
             </p>
             <PurchaseCourseButton
               courseId={course.id}
-              priceUSD={course.priceUSD}
+              priceCDF={course.priceCDF}
               isLoggedIn={!!user}
             />
           </div>

@@ -14,7 +14,7 @@ export default function CourseCard({
   category,
   level,
   type,
-  priceUSD,
+  priceCDF,
   certifying,
   instructor,
 }: {
@@ -23,7 +23,7 @@ export default function CourseCard({
   category: string;
   level: string;
   type: string;
-  priceUSD: number;
+  priceCDF: number;
   certifying: boolean;
   instructor?: string | null;
 }) {
@@ -70,7 +70,7 @@ export default function CourseCard({
             )}
           </div>
           <span className="font-display font-bold text-brand-navy">
-            {priceUSD === 0 ? "Gratuit" : `${(priceUSD / 100).toFixed(2)} $`}
+            {priceCDF === 0 ? "Gratuit" : `${priceCDF.toLocaleString("fr-FR")} FC`}
           </span>
         </div>
       </div>

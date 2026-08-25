@@ -4,14 +4,14 @@ import SubscribeButton from "@/components/SubscribeButton";
 import { IconMedal } from "@/lib/icons";
 
 export default async function SubscriptionPage() {
-  const plans = await prisma.plan.findMany({ orderBy: { priceUSD: "asc" } });
+  const plans = await prisma.plan.findMany({ orderBy: { priceCDF: "asc" } });
 
   return (
     <>
       <h1 className="font-display text-2xl font-extrabold text-brand-navy mb-2">Abonnements</h1>
       <p className="text-sm text-brand-slate/60 mb-8 max-w-md">
         Choisis le plan qui te correspond. Paiement sécurisé via Orange Money, Airtel Money,
-        M-Pesa ou carte bancaire.
+        Vodacom ou carte bancaire.
       </p>
 
       {plans.length === 0 ? (
@@ -28,11 +28,11 @@ export default async function SubscriptionPage() {
               <p className="font-display font-bold text-brand-navy text-lg">{p.name}</p>
               <p className="text-sm text-brand-slate/60 mt-1 mb-4">{p.description}</p>
               <p className="font-display font-extrabold text-2xl text-brand-navy mb-5">
-                {p.priceUSD === 0 ? "Gratuit" : `${(p.priceUSD / 100).toFixed(2)} $`}
-                {p.priceUSD > 0 && <span className="text-sm font-medium text-brand-slate/50"> /{p.durationDays}j</span>}
+                {p.priceCDF === 0 ? "Gratuit" : `${p.priceCDF.toLocaleString("fr-FR")} FC`}
+                {p.priceCDF > 0 && <span className="text-sm font-medium text-brand-slate/50"> /{p.durationDays}j</span>}
               </p>
 
-              {p.priceUSD === 0 ? (
+              {p.priceCDF === 0 ? (
                 <button
                   disabled
                   className="w-full bg-brand-line text-brand-slate/50 font-semibold py-2.5 rounded-full cursor-not-allowed"

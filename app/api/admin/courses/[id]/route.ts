@@ -10,7 +10,7 @@ const schema = z.object({
   categoryId: z.string().min(1),
   level: z.enum(["DEBUTANT", "INTERMEDIAIRE", "AVANCE"]),
   type: z.enum(["GRATUITE", "ABORDABLE", "CERTIFIANTE", "EXPERTE"]),
-  priceUSD: z.number().min(0),
+  priceCDF: z.number().min(0),
   certifying: z.boolean(),
   instructor: z.string().optional(),
   instructorId: z.string().nullable().optional(),

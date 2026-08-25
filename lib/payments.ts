@@ -1,9 +1,11 @@
 import { prisma } from "./prisma";
+import type { Payment } from "@prisma/client";
 import { checkCinetpayTransaction } from "./cinetpay";
+import { verifyMonerooTransaction } from "./moneroo";
 import { enrollUserInCourse } from "./enrollment";
 
 /**
- * Vérifie le statut réel d'un paiement auprès de CinetPay (jamais confiance
+ * Vérifie le statut réel d'un paiement auprès du prestataire (jamais confiance
  * aveugle dans une notification entrante), puis met à jour la base et
  * débloque l'accès correspondant (abonnement ou formation) si succès.
  * Idempotent : peut être appelée plusieurs fois sans effet de bord.
@@ -15,6 +17,12 @@ export async function verifyAndFulfillPayment(paymentId: string) {
   // Déjà traité — on ne refait rien
   if (payment.status === "SUCCESS") return payment;
 
+  if (payment.provider === "MONEROO") {
+    return verifyAndFulfillMonerooPayment(payment);
+  }
+
+  // CinetPay — conservé au cas où (compte marchand en attente d'approbation),
+  // mais aucun nouveau paiement n'est plus initié via ce prestataire.
   const check = await checkCinetpayTransaction(payment.id);
   const cinetpayStatus = check.data?.status;
 
@@ -43,7 +51,32 @@ export async function verifyAndFulfillPayment(paymentId: string) {
   return payment;
 }
 
-async function fulfillPayment(payment: { id: string; userId: string; purpose: string; amountUSD: number }) {
+async function verifyAndFulfillMonerooPayment(payment: Payment) {
+  if (!payment.providerRef) return payment; // pas encore de référence Moneroo connue
+
+  const result = await verifyMonerooTransaction(payment.providerRef);
+
+  if (result.status === "success") {
+    const updated = await prisma.payment.update({
+      where: { id: payment.id },
+      data: { status: "SUCCESS" },
+    });
+    await fulfillPayment(updated);
+    return updated;
+  }
+
+  if (result.status === "failed") {
+    return prisma.payment.update({
+      where: { id: payment.id },
+      data: { status: "FAILED" },
+    });
+  }
+
+  // Toujours en attente côté Moneroo
+  return payment;
+}
+
+async function fulfillPayment(payment: { id: string; userId: string; purpose: string }) {
   const [kind, refId] = payment.purpose.split(":");
 
   if (kind === "subscription") {

@@ -61,12 +61,12 @@ export default function TermsPage() {
           <Article number="4" title="Abonnements, achats et paiement">
             <ul className="list-disc pl-5 space-y-2">
               <li>
-                Les prix des formations et des abonnements sont indiqués en dollars américains (USD)
+                Les prix des formations et des abonnements sont indiqués en Francs Congolais (FC)
                 et affichés avant tout achat.
               </li>
               <li>
                 Les paiements sont traités par un prestataire tiers (mobile money : Orange Money,
-                Airtel Money, M-Pesa ; ou carte bancaire). E-Classe RDC ne stocke aucune donnée
+                Airtel Money, Vodacom ; ou carte bancaire). E-Classe RDC ne stocke aucune donnée
                 bancaire ou de paiement.
               </li>
               <li>

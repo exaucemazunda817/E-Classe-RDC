@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { initiateCinetpayPayment, CinetpayError } from "@/lib/cinetpay";
+import { initiateMonerooPayment, MonerooError } from "@/lib/moneroo";
 
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
@@ -20,26 +20,26 @@ export async function POST(req: Request) {
   const user = await prisma.user.findUnique({ where: { id: session.user.id } });
   if (!user) return NextResponse.json({ error: "Utilisateur introuvable." }, { status: 404 });
 
-  let amountUSD = 0;
+  let amountCDF = 0;
   let description = "";
   let purposeString = "";
 
   if (purpose === "subscription" && planId) {
     const plan = await prisma.plan.findUnique({ where: { id: planId } });
     if (!plan) return NextResponse.json({ error: "Plan introuvable." }, { status: 404 });
-    if (plan.priceUSD === 0) {
+    if (plan.priceCDF === 0) {
       return NextResponse.json({ error: "Ce plan est gratuit, aucun paiement requis." }, { status: 400 });
     }
-    amountUSD = plan.priceUSD / 100;
+    amountCDF = plan.priceCDF;
     description = `Abonnement ${plan.name} — E-Classe RDC`;
     purposeString = `subscription:${plan.id}`;
   } else if (purpose === "course" && courseId) {
     const course = await prisma.course.findUnique({ where: { id: courseId } });
     if (!course) return NextResponse.json({ error: "Formation introuvable." }, { status: 404 });
-    if (course.priceUSD === 0) {
+    if (course.priceCDF === 0) {
       return NextResponse.json({ error: "Cette formation est gratuite, aucun paiement requis." }, { status: 400 });
     }
-    amountUSD = course.priceUSD / 100;
+    amountCDF = course.priceCDF;
     description = `Formation : ${course.title} — E-Classe RDC`;
     purposeString = `course:${course.id}`;
   } else {
@@ -49,8 +49,8 @@ export async function POST(req: Request) {
   const payment = await prisma.payment.create({
     data: {
       userId: user.id,
-      amountUSD: Math.round(amountUSD * 100),
-      provider: "CINETPAY",
+      amountCDF,
+      provider: "MONEROO",
       status: "PENDING",
       purpose: purposeString,
     },
@@ -59,20 +59,24 @@ export async function POST(req: Request) {
   const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
 
   try {
-    const paymentUrl = await initiateCinetpayPayment({
+    const { checkoutUrl, monerooPaymentId } = await initiateMonerooPayment({
       transactionId: payment.id,
-      amountUSD,
+      amountCDF,
       description,
       customerName: user.name,
       customerEmail: user.email,
       returnUrl: `${baseUrl}/payment/return?ref=${payment.id}`,
-      notifyUrl: `${baseUrl}/api/payments/webhook`,
     });
 
-    return NextResponse.json({ url: paymentUrl });
+    await prisma.payment.update({
+      where: { id: payment.id },
+      data: { providerRef: monerooPaymentId },
+    });
+
+    return NextResponse.json({ url: checkoutUrl });
   } catch (err) {
     await prisma.payment.update({ where: { id: payment.id }, data: { status: "FAILED" } });
-    const message = err instanceof CinetpayError ? err.message : "Erreur lors de l'initialisation du paiement.";
+    const message = err instanceof MonerooError ? err.message : "Erreur lors de l'initialisation du paiement.";
     return NextResponse.json({ error: message }, { status: 502 });
   }
 }

@@ -59,8 +59,8 @@ export default async function PurchasesPage() {
               <span className={`text-xs font-semibold px-2.5 py-1 rounded-full shrink-0 ${statusStyles[p.status]}`}>
                 {statusLabels[p.status]}
               </span>
-              <span className="font-display font-bold text-brand-navy text-sm shrink-0 w-16 text-right">
-                {(p.amountUSD / 100).toFixed(2)} $
+              <span className="font-display font-bold text-brand-navy text-sm shrink-0 w-24 text-right">
+                {p.amountCDF.toLocaleString("fr-FR")} FC
               </span>
             </div>
           ))}

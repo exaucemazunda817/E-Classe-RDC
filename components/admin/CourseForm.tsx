@@ -13,7 +13,7 @@ type CourseData = {
   categoryId: string;
   level: "DEBUTANT" | "INTERMEDIAIRE" | "AVANCE";
   type: "GRATUITE" | "ABORDABLE" | "CERTIFIANTE" | "EXPERTE";
-  priceUSD: number;
+  priceCDF: number;
   certifying: boolean;
   instructor: string;
   instructorId?: string; // "" = aucun compte lié
@@ -25,7 +25,7 @@ const emptyCourse: CourseData = {
   categoryId: "",
   level: "DEBUTANT",
   type: "GRATUITE",
-  priceUSD: 0,
+  priceCDF: 0,
   certifying: false,
   instructor: "",
   instructorId: "",
@@ -61,7 +61,7 @@ export default function CourseForm({
 
     const payload: Record<string, unknown> = {
       ...data,
-      priceUSD: Math.round(Number(data.priceUSD) * 100), // dollars -> cents
+      priceCDF: Math.round(Number(data.priceCDF)),
     };
 
     // Le lien vers un compte formateur n'est modifiable que depuis l'espace admin :
@@ -159,13 +159,13 @@ export default function CourseForm({
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        <Field label="Prix (USD, 0 si gratuit)">
+        <Field label="Prix (FC, 0 si gratuit)">
           <input
             type="number"
             min={0}
-            step="0.01"
-            value={data.priceUSD}
-            onChange={(e) => setData({ ...data, priceUSD: Number(e.target.value) })}
+            step="1"
+            value={data.priceCDF}
+            onChange={(e) => setData({ ...data, priceCDF: Number(e.target.value) })}
             className="input"
           />
         </Field>

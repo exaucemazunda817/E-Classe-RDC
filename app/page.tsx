@@ -163,7 +163,7 @@ export default async function HomePage() {
                   category={c.category.name}
                   level={c.level}
                   type={c.type}
-                  priceUSD={c.priceUSD}
+                  priceCDF={c.priceCDF}
                   certifying={c.certifying}
                   instructor={c.instructor}
                 />

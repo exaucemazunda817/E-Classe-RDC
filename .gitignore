@@ -6,6 +6,8 @@ prisma/dev.db-journal
 .env
 .env.local
 .env.production
+.env.*
+!.env.example
 .DS_Store
 *.log
 npm-debug.log*
