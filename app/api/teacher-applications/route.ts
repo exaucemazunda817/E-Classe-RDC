@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 // Formulaire public : aucune connexion requise. On garde des limites généreuses
 // mais raisonnables pour éviter qu'un envoi malveillant ne remplisse la base.
@@ -22,6 +23,15 @@ const fieldsSchema = z
   });
 
 export async function POST(req: Request) {
+  const ip = getClientIp(req);
+  const rateLimit = await checkRateLimit(`teacher-application:${ip}`, 5, 60 * 60 * 1000);
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "Trop de candidatures envoyées. Réessaie plus tard." },
+      { status: 429, headers: { "Retry-After": String(rateLimit.retryAfterSeconds) } }
+    );
+  }
+
   const form = await req.formData();
 
   const parsed = fieldsSchema.safeParse({
